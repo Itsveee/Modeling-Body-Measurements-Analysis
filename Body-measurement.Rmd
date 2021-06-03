@@ -1,0 +1,132 @@
+---
+title: "Untitled"
+author: "VENKATESH"
+date: "6/3/2021"
+output: html_document
+---
+
+
+
+
+ VENKATESH RAMSHETTY 
+
+## Problem Statement
+ Examination for normality assumption of the variable height(hgt) 
+and to decide whether it fits in normal distribution independently in people(male and Female).
+Determine: the calculation for given descritpive statistics of height in male and female. 
+We need to plot the histrogram and generation for theoretical normal distribution and to perform examnation of
+empirical as well as theoretical observations, Which is utilized to check whether the information fits in normal distribution or not.
+
+
+## Load Packages
+
+```{r}
+install.packages("dplyr")
+install.packages("readr")
+install.packages("magrittr")
+
+library(dplyr) #For manipulation of data
+library(readr) #Useful for importing data to R
+library(magrittr) #Useful for using pipe operator
+
+```
+
+## Data
+
+Import the body measurements data and prepare it for analysis. Show your code.
+
+
+```{r}
+
+## to read data from the drive 
+body_ms <- read_csv("E:/semester 1/Intro to statistics/assignment1/bdims.csv")
+
+#create object body_ms
+body_ms$sex <- body_ms$sex %>% factor(levels = c(1,0), labels = c("Male", "Female"))
+levels(body_ms$sex)
+
+```
+
+
+
+
+## Distribution Fitting
+
+Compare the empirical distribution of selected body measurement to a normal distribution separately in men and in women. You need to do this visually by plotting the histogram with normal distribution overlay. Show your code.
+
+
+```{r}
+# Distribution Fitting section
+#Filtering the dataframe based on sex
+female = body_ms %>% filter(sex == 'Female')
+male = body_ms %>% filter(sex == 'Male')
+
+# Calculation of mean and Standard deviation for Female
+#so let's store as a separate object and then calculate statistics that will be referenced later.
+femalemean = mean(female$hgt)
+femalesd = sd(female$hgt)
+
+# Calculation of mean and standard deviation for Male
+malemean = mean(male$hgt)
+malesd = sd(male$hgt)
+
+# to Generate the theoretical normal distribution for Female
+body_female = seq(-4, 4, length=1000) * femalesd + femalemean
+femalenorm = dnorm(body_female, mean = femalemean, sd = femalesd)
+
+# to  Generate of the theoretical normal distribution for Male
+body_male = seq(-4, 4, length=1000) * malesd + malemean
+malenorm = dnorm(body_male, mean = malemean, sd = malesd)
+
+
+# plotting histogram with normal distribution overlay
+
+# for female
+
+hist(female$hgt, ylim = c(0, 0.07), xlim = c(femalemean - 3 * femalesd, femalemean + 3 * femalesd), 
+     ylab = 'Density', xlab = 'height in centimeters', main = 'Histogram of Female Height distribution', probability = TRUE)
+abline(v = femalemean, col = 'blue')
+lines(body_female, femalenorm, col = 'red')
+grid()
+```
+
+```{r}
+# for male
+hist(male$hgt, ylim = c(0, 0.08), xlim = c(malemean - 3 * malesd, malemean + 3 * malesd), 
+     ylab = 'Density', xlab = 'height in centimeters', main = 'Histogram of male Height distribution', probability = TRUE)
+abline(v = malemean, col = 'red')
+lines(body_male, malenorm, col = 'blue')
+grid()
+```
+
+```{r}
+#1st probabilty for male
+qnorm(p = 0.25, mean = malemean, sd = malesd)
+#3rd probabilty for male
+qnorm(p = 0.75, mean = malemean, sd = malesd)
+
+#1st probabilty for female
+qnorm(p = 0.25, mean = femalemean, sd = femalesd)
+#3rd probabilty for female
+qnorm(p = 0.75, mean = femalemean, sd = femalesd)
+
+```
+
+
+
+## Interpretation
+
+we can plot a normal distribution curve on top of the histogram and we can see how closely the values(data) 
+follow a normal distribution. 
+This normal distribution curve should have the same mean and standard deviation(sd) as the data.
+
+For Male:
+  The normal distribution curve is bell shaped and also the values for mean and median are equal.Also the values for theoretical and empricial values do not exceed 0.5. Hence it fits the normal distribution.
+
+For Female:
+  
+  The normal distribution curve is bell shaped but the values for mean and median are greater than 0.5.Also the values for theoretical and empricial values exceeds 0.5. Hence it does not fit in the normal distribution.
+  
+Conclusion:
+From the above histograms and summary statistics, the male height distribution seems to be symmetric
+while the female distribution is not symetric and it appears slightly skewed to the left.Male height which is noraml distribution where as female height is not normal distribution.
